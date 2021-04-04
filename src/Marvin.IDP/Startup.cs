@@ -5,8 +5,10 @@
 using IdentityServer4;
 using IdentityServer4.Quickstart.UI;
 using IdentityServer4.Services;
+using Marvin.IDP.Areas.Identity.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,7 +29,9 @@ namespace Marvin.IDP
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddMvc();
+
+            services.AddTransient<IEmailSender, DummyEmailSender>();
 
             //// configures IIS out-of-proc settings (see https://github.com/aspnet/AspNetCore/issues/14882)
             //services.Configure<IISOptions>(iis =>
@@ -49,8 +53,8 @@ namespace Marvin.IDP
                 options.Events.RaiseInformationEvents = true;
                 options.Events.RaiseFailureEvents = true;
                 options.Events.RaiseSuccessEvents = true;
-            })
-                .AddTestUsers(TestUsers.Users);
+            }).AddAspNetIdentity<ApplicationUser>();
+              
 
             // in-memory, code config
             builder.AddInMemoryIdentityResources(Config.Ids);
@@ -58,14 +62,7 @@ namespace Marvin.IDP
             builder.AddInMemoryClients(Config.Clients);
              
             // not recommended for production - you need to store your key material somewhere secure
-            builder.AddDeveloperSigningCredential();
-
-            //// for demo purposes, allow cors requests
-            //var cors = new DefaultCorsPolicyService(LoggerFactory.CreateLogger<DefaultCorsPolicyService>())
-            //{
-            //    AllowAll = true
-            //};
-            //services.AddSingleton<ICorsPolicyService>(cors);
+            builder.AddDeveloperSigningCredential(); 
 
             services.AddAuthentication();
         }
@@ -84,7 +81,9 @@ namespace Marvin.IDP
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
                 endpoints.MapDefaultControllerRoute();
+                endpoints.MapRazorPages();
             });
         }
     }
