@@ -24,7 +24,8 @@ namespace TimeToGo.WebApp
                 options.ProviderOptions.ClientId = "bethanyspieshophr";
                 options.ProviderOptions.RedirectUri = "https://localhost:44341/authentication/login-callback";
                 options.ProviderOptions.PostLogoutRedirectUri = "https://localhost:44341/authentication/logout-callback";
-                options.ProviderOptions.DefaultScopes.Add("email"); 
+                options.ProviderOptions.DefaultScopes.Add("email");
+                options.ProviderOptions.DefaultScopes.Add("bethanyspieshophrapi");
                 options.ProviderOptions.ResponseType = "code";
             });
 
