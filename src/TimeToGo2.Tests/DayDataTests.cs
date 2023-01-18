@@ -1,89 +1,40 @@
 ﻿namespace TimeToGo2.Tests
 {
     using FluentAssertions;
+    using FluentAssertions.Execution;
     using NUnit.Framework;
     using TimeToGo2.WebApp.Data;
 
     public class DayDataTests
     {
-        private readonly JobConstraints jobConstraints = new ();
+        private readonly JobConstraints jobConstraints = new();
 
-        [Test]
-        public void BeenAtWorkOneHourTest()
+        [TestCase(8, 0, 9, 0, null, 60, 0)]
+        [TestCase(8, 0, 14, 0, null, 360, 0)]
+        [TestCase(8, 0, 14, 15, null, 360, 15)]
+        [TestCase(8, 0, 14, 30, null, 360, 30)]
+        [TestCase(8, 0, 14, 31, null, 361, 30)]
+        [TestCase(8, 0, 18, 31, null, 601, 30)]
+        [TestCase(8, 0, 14, 0, 20, 340, 20)]
+        [TestCase(8, 0, 14, 0, 10, 350, 10)]
+        [TestCase(8, 0, 14, 0, 0, 360, 0)]
+        [TestCase(8, 0, 14, 30, 20, 360, 30)]
+        [TestCase(8, 0, 14, 30, 60, 330, 60)]
+        public void BeenAtWorkTest(int timeArrivedHour, int timeArrivedMinute, int timeLeftHour, int timeLeftMinute,
+                                   int? pauseDurationInMinutes, int expectedWorkedHoursInMinutes, int expectedCalculatedPauseDuration)
         {
             var dayData = new DayData(1, jobConstraints)
             {
-                TimeArrived = TimeOnly.FromTimeSpan(TimeSpan.FromHours(8)),
-                TimeLeft = TimeOnly.FromTimeSpan(TimeSpan.FromHours(9))
+                TimeArrived = TimeOnly.FromTimeSpan(TimeSpan.FromHours(timeArrivedHour) + TimeSpan.FromMinutes(timeArrivedMinute)),
+                TimeLeft = TimeOnly.FromTimeSpan(TimeSpan.FromHours(timeLeftHour) + TimeSpan.FromMinutes(timeLeftMinute)),
+                PauseDuration = pauseDurationInMinutes.HasValue ? TimeSpan.FromMinutes(pauseDurationInMinutes.Value) : null
             };
 
-            dayData.WorkedHours.Should().Be(TimeSpan.FromHours(1));
-            dayData.CalculatedPauseDuration.Should().Be(TimeSpan.FromMinutes(0));
-        }
-
-        [Test]
-        public void BeenAtWorkSixHoursTest()
-        {
-            var dayData = new DayData(1, jobConstraints)
+            using (new AssertionScope())
             {
-                TimeArrived = TimeOnly.FromTimeSpan(TimeSpan.FromHours(8)),
-                TimeLeft = TimeOnly.FromTimeSpan(TimeSpan.FromHours(14))
-            };
-
-            dayData.WorkedHours.Should().Be(TimeSpan.FromHours(6));
-            dayData.CalculatedPauseDuration.Should().Be(TimeSpan.FromMinutes(0));
-        }
-
-        [Test]
-        public void BeenAtWorkSixHoursAndFifteenMinutesTest()
-        {
-            var dayData = new DayData(1, jobConstraints)
-            {
-                TimeArrived = TimeOnly.FromTimeSpan(TimeSpan.FromHours(8)),
-                TimeLeft = TimeOnly.FromTimeSpan(TimeSpan.FromHours(14) + TimeSpan.FromMinutes(15))
-            };
-
-            dayData.WorkedHours.Should().Be(TimeSpan.FromHours(6));
-            dayData.CalculatedPauseDuration.Should().Be(TimeSpan.FromMinutes(15));
-        }
-
-        [Test]
-        public void BeenAtWorkSixHoursAndThirtyMinutesTest()
-        {
-            var dayData = new DayData(1, jobConstraints)
-            {
-                TimeArrived = TimeOnly.FromTimeSpan(TimeSpan.FromHours(8)),
-                TimeLeft = TimeOnly.FromTimeSpan(TimeSpan.FromHours(14) + TimeSpan.FromMinutes(30))
-            };
-
-            dayData.WorkedHours.Should().Be(TimeSpan.FromHours(6));
-            dayData.CalculatedPauseDuration.Should().Be(TimeSpan.FromMinutes(30));
-        }
-
-        [Test]
-        public void BeenAtWorkSixHoursAndThirtyOneMinutesTest()
-        {
-            var dayData = new DayData(1, jobConstraints)
-            {
-                TimeArrived = TimeOnly.FromTimeSpan(TimeSpan.FromHours(8)),
-                TimeLeft = TimeOnly.FromTimeSpan(TimeSpan.FromHours(14) + TimeSpan.FromMinutes(31))
-            };
-
-            dayData.WorkedHours.Should().Be(TimeSpan.FromHours(6) + TimeSpan.FromMinutes(1));
-            dayData.CalculatedPauseDuration.Should().Be(TimeSpan.FromMinutes(30));
-        }
-
-        [Test]
-        public void BeenAtWorkTenHoursAndThirtyOneMinutesTest()
-        {
-            var dayData = new DayData(1, jobConstraints)
-            {
-                TimeArrived = TimeOnly.FromTimeSpan(TimeSpan.FromHours(8)),
-                TimeLeft = TimeOnly.FromTimeSpan(TimeSpan.FromHours(18) + TimeSpan.FromMinutes(31))
-            };
-
-            dayData.WorkedHours.Should().Be(TimeSpan.FromHours(10) + TimeSpan.FromMinutes(1));
-            dayData.CalculatedPauseDuration.Should().Be(TimeSpan.FromMinutes(30));
+                dayData.WorkedHours.TotalMinutes.Should().Be(expectedWorkedHoursInMinutes);
+                dayData.CalculatedPauseDuration.Should().Be(TimeSpan.FromMinutes(expectedCalculatedPauseDuration));
+            }
         }
     }
 }
