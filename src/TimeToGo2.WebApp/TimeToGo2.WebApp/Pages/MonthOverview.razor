@@ -1,36 +1,43 @@
-﻿@page "/month"
+﻿@page "/month/{year:int?}/{month:int?}"
 @using TimeToGo2.WebApp.Data
-@inject WeatherForecastService ForecastService
+@inject MonthService MonthService
 
 <PageTitle>Month overview</PageTitle>
 
-<h1>Month overview</h1>
-
 <p>This component demonstrates fetching data from a service.</p>
 
-@if (forecasts == null)
+@if (monthData == null)
 {
-    <p><em>Loading...</em></p>
+	<h1>Month overview</h1>
+	<p><em>Loading...</em></p>
 }
 else
 {
-    <table class="table">
+    <h1>Month overview @monthData.Month/@monthData.Year</h1>
+	
+	<table class="table">
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
+                <th></th>
+                <th>Day</th>
+	            <th>Arrived</th>
+                <th>Left</th>
+                <th>Pause duration</th>
+                <th>Calc. pause duration</th>
+                <th>Worked hours</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var forecast in forecasts)
+            @foreach (var dayData in monthData.Days)
             {
                 <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
+                    <td>@dayData.DayInMonth</td>
+                    <td>@dayData.DayOfWeek</td>
+                    <td>@dayData.TimeArrived.ToShortTimeString()</td>
+                    <td>@dayData.TimeLeft?.ToShortTimeString()</td>
+                    <td>@dayData.PauseDuration?.ToString(@"hh\:mm")</td>
+                    <td>@dayData.CalculatedPauseDuration.ToString(@"hh\:mm")</td>
+                    <td>@dayData.WorkedHours.ToString(@"hh\:mm")</td>
                 </tr>
             }
         </tbody>
@@ -38,10 +45,22 @@ else
 }
 
 @code {
-    private WeatherForecast[]? forecasts;
+	[Parameter]
+	public int? Year { get; set; }
+
+	[Parameter]
+    public int? Month { get; set; }
+
+	protected override void OnInitialized()
+	{
+		Year = Year ?? DateTime.Now.Year;
+		Month = Month ?? DateTime.Now.Month;
+	}
+	
+	private MonthData? monthData;
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await ForecastService.GetForecastAsync(DateOnly.FromDateTime(DateTime.Now));
+        monthData = await MonthService.GetAsync(Year.Value, Month.Value);
     }
 }

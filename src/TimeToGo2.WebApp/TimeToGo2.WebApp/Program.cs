@@ -14,6 +14,7 @@ namespace TimeToGo2.WebApp
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
             builder.Services.AddSingleton<WeatherForecastService>();
+            builder.Services.AddSingleton<MonthService>();
 
             var app = builder.Build();
 

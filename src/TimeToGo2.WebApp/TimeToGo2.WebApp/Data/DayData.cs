@@ -31,10 +31,13 @@ public class DayData
 
     public TimeSpan WorkedHours => GetWorkedHours();
 
-    public DayData(int dayInMonth, JobConstraints jobConstraints)
+    public DayOfWeek DayOfWeek { get; }
+
+    public DayData(int year, int month, int dayInMonth, JobConstraints jobConstraints)
     {
         this.jobConstraints = jobConstraints;
         DayInMonth = dayInMonth;
+        DayOfWeek = new DateTime(year, month, dayInMonth).DayOfWeek;
     }
 
     private TimeSpan GetWorkedHours()
