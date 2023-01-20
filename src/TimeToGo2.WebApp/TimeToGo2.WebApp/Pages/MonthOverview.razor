@@ -13,35 +13,119 @@
 }
 else
 {
-    <h1>Month overview @monthData.Month/@monthData.Year</h1>
-	
+	<h1>Month overview @monthData.Month/@monthData.Year</h1>
+	@*https://stackoverflow.com/questions/60906486/blazor-inline-editing-table-and-getting-all-component-values-on-event*@
+
 	<table class="table">
-        <thead>
-            <tr>
-                <th>Day</th>
-	            <th>Arrived</th>
-                <th>Left</th>
-                <th>Spent outside</th>
-                <th>Delta from gate system</th>
-                <th>Daily delta</th>
-                <th>Working day</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var dayData in monthData.Days)
-            {
-                <tr>
-                    <td>@dayData.DayInMonth @dayData.DayOfWeek</td>
-                    <td>@dayData.TimeArrived?.ToShortTimeString()</td>
-                    <td>@dayData.TimeLeft?.ToShortTimeString()</td>
-                    <td>@dayData.SpentOutside?.ToString(@"hh\:mm")</td>
-                    <td>@dayData.DeltaFromGateSystem?.ToString(@"hh\:mm")</td>
-                    <td>@dayData.DailyDelta.ToString(@"hh\:mm")</td>
-                    <td>@dayData.IsWorkDay</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+		<thead>
+		<tr>
+			<th>Day</th>
+			<th>Arrived</th>
+			<th>Left</th>
+			<th>Spent outside</th>
+			<th>Delta from gate system</th>
+			<th>Daily delta</th>
+			<th>Working day</th>
+			<th>Working day</th>
+		</tr>
+		</thead>
+		<tbody>
+		@foreach (var dayData in monthData.Days)
+		{
+			if (dayData.IsEditing)
+				{
+					<tr>
+						<td></td>
+						<td><InputDate Type="InputDateType.Time" @bind-Value="@dayData.TimeArrived"/></td>
+						<td><InputDate Type="InputDateType.Time" @bind-Value="@dayData.TimeLeft" /></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td>
+							<button type="button" class="btn btn-link" @onclick="() => EnableEditing(false, dayData)">
+								<i class="fas fa-window-close" />
+							</button>
+							<button type="button" class="btn btn-link" @onclick="() => UpdateInstance(dayData)">
+								<i class="fas fa-check-square" />
+							</button>
+						</td>
+					</tr>
+				}
+				else
+			{
+				<tr>
+					<td>@dayData.DayInMonth @dayData.DayOfWeek</td>
+					<td>@dayData.TimeArrived?.ToShortTimeString()</td>
+					<td>@dayData.TimeLeft?.ToShortTimeString()</td>
+					<td>@dayData.SpentOutside?.ToString(@"hh\:mm")</td>
+					<td>@dayData.DeltaFromGateSystem?.ToString(@"hh\:mm")</td>
+					<td>@dayData.DailyDelta.ToString(@"hh\:mm")</td>
+					<td>@dayData.IsWorkDay</td>
+					<td>
+						<button type="button" class="btn btn-link" @onclick="() => EnableEditing(true, dayData)">
+							<i class="fas fa-pen"></i>
+						</button>
+					</td>
+				</tr>
+			}
+		}
+		</tbody>
+	</table>
+
+@*More: https://learn.microsoft.com/en-us/aspnet/core/blazor/data-binding?view=aspnetcore-3.1*@
+
+@*Bind:<input type="text" class="form-control" placeholder="Give the instance a name" @bind="@instance.DisplayName" />*@
+
+	
+			@*@foreach (var instance in serverInstances)
+		{
+		if (instance.IsEditing)
+		{
+		<tr>
+		<th scope="row">@instance.GetShortenedIdentifier()</th>
+		<td>
+		<input type="text" class="form-control" placeholder="Give the instance a name" value="@instance.DisplayName" />
+		</td>
+		<td>
+		<input type="text" class="form-control" placeholder="e.g. http://localhost (without port)" value="@instance.BaseAddress" />
+		</td>
+		<td>
+		<input type="number" class="form-control" placeholder="The port number server is running on" value="@instance.Port"
+		min="0" max="65535" />
+		</td>
+		<td>
+		<input type="text" class="form-control" placeholder="For information purposes and not required" value="@instance.Version" />
+		</td>
+		<td>
+		<input type="text" class="form-control" placeholder="Any other details to add (e.g. Feature environment mocks instance)" value="@instance.AdditionalInformation" />
+		</td>
+		<td>
+		<button type="button" class="btn btn-link" @onclick="() => EnableEditing(false, instance)">
+		<i class="fas fa-window-close" />
+		</button>
+		<button type="button" class="btn btn-link" @onclick="() => UpdateInstance(instance)">
+		<i class="fas fa-check-square" />
+		</button>
+		</td>
+		</tr>
+		}
+		else
+		{
+		<tr>
+		<th scope="row">@instance.GetShortenedIdentifier()</th>
+		<td>@instance.DisplayName</td>
+		<td>@instance.BaseAddress</td>
+		<td>@instance.Port</td>
+		<td>@instance.Version</td>
+		<td>@instance.AdditionalInformation</td>
+		<td>
+		<button type="button" class="btn btn-link" @onclick="() => EnableEditing(true, instance)">
+		<i class="fas fa-pen" />
+		</button>
+		</td>
+		</tr>
+		}*@
 }
 
 @code {
@@ -49,21 +133,34 @@ else
 	public int? Year { get; set; }
 
 	[Parameter]
-    public int? Month { get; set; }
+	public int? Month { get; set; }
+
+	private void EnableEditing(bool flag, DayViewModel dayViewModel)
+	{
+		dayViewModel.IsEditing = flag;
+	}
+
+	private void UpdateInstance(DayViewModel dayViewModel)
+	{
+		EnableEditing(false, dayViewModel);
+
+	//call the repository to update the instance here.
+	//show toast after done.
+	}
 
 	protected override void OnInitialized()
 	{
 		Year = Year ?? DateTime.Now.Year;
 		Month = Month ?? DateTime.Now.Month;
 
-		
+
 	}
-	
+
 	private MonthDataViewModel? monthData;
 
-    protected override async Task OnInitializedAsync()
-    {
-	    await ViewModel.InitializeAsync(Year.Value, Month.Value);
-	    monthData = ViewModel.MonthData;
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		await ViewModel.InitializeAsync(Year.Value, Month.Value);
+		monthData = ViewModel.MonthData;
+	}
 }

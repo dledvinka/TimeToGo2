@@ -110,6 +110,8 @@
             }
         }
 
+        public bool IsEditing { get; set; }
+
         public DayViewModel(IJobConstraints jobConstraints) => _jobConstraints = jobConstraints;
 
         private TimeSpan GetCalculatedPauseDuration()
