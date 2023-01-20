@@ -1,6 +1,6 @@
 ﻿@page "/month/{year:int?}/{month:int?}"
-@using TimeToGo2.WebApp.Data
-@inject MonthService MonthService
+@using TimeToGo2.WebApp.ViewModels
+@inject MonthPageViewModel ViewModel
 
 <PageTitle>Month overview</PageTitle>
 
@@ -18,26 +18,26 @@ else
 	<table class="table">
         <thead>
             <tr>
-                <th></th>
                 <th>Day</th>
 	            <th>Arrived</th>
                 <th>Left</th>
-                <th>Pause duration</th>
-                <th>Calc. pause duration</th>
-                <th>Worked hours</th>
+                <th>Spent outside</th>
+                <th>Delta from gate system</th>
+                <th>Daily delta</th>
+                <th>Working day</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var dayData in monthData.Days)
             {
                 <tr>
-                    <td>@dayData.DayInMonth</td>
-                    <td>@dayData.DayOfWeek</td>
-                    <td>@dayData.TimeArrived.ToShortTimeString()</td>
+                    <td>@dayData.DayInMonth @dayData.DayOfWeek</td>
+                    <td>@dayData.TimeArrived?.ToShortTimeString()</td>
                     <td>@dayData.TimeLeft?.ToShortTimeString()</td>
-                    <td>@dayData.PauseDuration?.ToString(@"hh\:mm")</td>
-                    <td>@dayData.CalculatedPauseDuration.ToString(@"hh\:mm")</td>
-                    <td>@dayData.WorkedHours.ToString(@"hh\:mm")</td>
+                    <td>@dayData.SpentOutside?.ToString(@"hh\:mm")</td>
+                    <td>@dayData.DeltaFromGateSystem?.ToString(@"hh\:mm")</td>
+                    <td>@dayData.DailyDelta.ToString(@"hh\:mm")</td>
+                    <td>@dayData.IsWorkDay</td>
                 </tr>
             }
         </tbody>
@@ -55,12 +55,15 @@ else
 	{
 		Year = Year ?? DateTime.Now.Year;
 		Month = Month ?? DateTime.Now.Month;
+
+		
 	}
 	
-	private MonthData? monthData;
+	private MonthDataViewModel? monthData;
 
     protected override async Task OnInitializedAsync()
     {
-        monthData = await MonthService.GetAsync(Year.Value, Month.Value);
+	    await ViewModel.InitializeAsync(Year.Value, Month.Value);
+	    monthData = ViewModel.MonthData;
     }
 }

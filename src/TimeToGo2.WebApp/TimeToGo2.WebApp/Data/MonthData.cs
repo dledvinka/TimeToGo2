@@ -1,13 +1,6 @@
 public class MonthData
 {
-    public MonthData(int year, int month)
-    {
-        Year = year;
-        Month = month;
-    }
-
-    public int Year { get; }
-
-    public int Month { get; }
+    public int Year { get; set; }
+    public int Month { get; set; }
     public List<DayData> Days { get; set; }
 }

@@ -4,6 +4,8 @@ using TimeToGo2.WebApp.Data;
 
 namespace TimeToGo2.WebApp
 {
+    using TimeToGo2.WebApp.ViewModels;
+
     public class Program
     {
         public static void Main(string[] args)
@@ -14,7 +16,9 @@ namespace TimeToGo2.WebApp
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
             builder.Services.AddSingleton<WeatherForecastService>();
-            builder.Services.AddSingleton<MonthService>();
+            builder.Services.AddSingleton<IMonthService, MonthService>();
+            builder.Services.AddSingleton<IJobConstraints, JobConstraints>();
+            builder.Services.AddSingleton<MonthPageViewModel>();
 
             var app = builder.Build();
 
