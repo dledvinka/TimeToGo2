@@ -1,6 +1,6 @@
 ﻿namespace TimeToGo2.WebApp.ViewModels
 {
-    using TimeToGo2.WebApp.Data;
+    using TimeToGo2.WebApp.Configuration;
 
     public class DayViewModel
     {
@@ -156,6 +156,7 @@
 
         public void SetData(int year, int month, DayData dayData)
         {
+            Id = dayData.Id;
             TimeArrived = dayData.TimeArrived;
             TimeLeft = dayData.TimeLeft;
             SpentOutside = dayData.SpentOutside;
@@ -164,6 +165,8 @@
             DayInMonth = dayData.DayInMonth;
             DayOfWeek = new DateTime(year, month, DayInMonth).DayOfWeek;
         }
+
+        public int Id { get; private set; }
 
         public DayData GetData() => new DayData();
     }

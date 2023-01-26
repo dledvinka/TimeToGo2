@@ -1,6 +1,6 @@
 ﻿namespace TimeToGo2.WebApp.ViewModels
 {
-    using TimeToGo2.WebApp.Data;
+    using TimeToGo2.WebApp.Configuration;
 
     public class MonthDataViewModel
     {

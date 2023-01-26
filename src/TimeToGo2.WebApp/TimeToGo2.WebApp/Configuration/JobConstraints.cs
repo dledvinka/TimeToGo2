@@ -1,4 +1,4 @@
-﻿namespace TimeToGo2.WebApp.Data
+﻿namespace TimeToGo2.WebApp.Configuration
 {
     public class JobConstraints : IJobConstraints
     {

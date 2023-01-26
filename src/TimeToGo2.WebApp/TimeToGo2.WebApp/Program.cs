@@ -1,9 +1,9 @@
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using TimeToGo2.WebApp.Data;
-
 namespace TimeToGo2.WebApp
 {
+    using System.Reflection;
+    using MediatR;
+    using TimeToGo2.WebApp.Configuration;
+    using TimeToGo2.WebApp.Features.Weather;
     using TimeToGo2.WebApp.ViewModels;
 
     public class Program
@@ -15,8 +15,7 @@ namespace TimeToGo2.WebApp
             // Add services to the container.
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
-            builder.Services.AddSingleton<WeatherForecastService>();
-            builder.Services.AddSingleton<IMonthService, MonthService>();
+            builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
             builder.Services.AddSingleton<IJobConstraints, JobConstraints>();
             builder.Services.AddSingleton<MonthPageViewModel>();
 

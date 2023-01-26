@@ -46,7 +46,7 @@ else
 							<button type="button" class="btn btn-link" @onclick="() => EnableEditing(false, dayData)">
 								<i class="fas fa-window-close" />
 							</button>
-							<button type="button" class="btn btn-link" @onclick="() => UpdateInstance(dayData)">
+							<button type="button" class="btn btn-link" @onclick="() => UpdateInstanceAsync(dayData)">
 								<i class="fas fa-check-square" />
 							</button>
 						</td>
@@ -104,7 +104,7 @@ else
 		<button type="button" class="btn btn-link" @onclick="() => EnableEditing(false, instance)">
 		<i class="fas fa-window-close" />
 		</button>
-		<button type="button" class="btn btn-link" @onclick="() => UpdateInstance(instance)">
+		<button type="button" class="btn btn-link" @onclick="() => UpdateInstanceAsync(instance)">
 		<i class="fas fa-check-square" />
 		</button>
 		</td>
@@ -137,12 +137,16 @@ else
 
 	private void EnableEditing(bool flag, DayViewModel dayViewModel)
 	{
+		_editedDay = flag ? dayViewModel : default;
 		dayViewModel.IsEditing = flag;
 	}
 
-	private void UpdateInstance(DayViewModel dayViewModel)
+	private DayViewModel _editedDay;
+
+	private async Task UpdateInstanceAsync(DayViewModel dayViewModel)
 	{
 		EnableEditing(false, dayViewModel);
+		await ViewModel.UpdateDayAsync(dayViewModel);
 
 	//call the repository to update the instance here.
 	//show toast after done.

@@ -3,7 +3,7 @@
     using FluentAssertions;
     using FluentAssertions.Execution;
     using NUnit.Framework;
-    using TimeToGo2.WebApp.Data;
+    using TimeToGo2.WebApp.Configuration;
     using TimeToGo2.WebApp.ViewModels;
 
     public class DayViewModelTests

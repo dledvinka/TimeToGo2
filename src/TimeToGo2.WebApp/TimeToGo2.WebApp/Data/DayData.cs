@@ -1,4 +1,6 @@
-public class DayData
+using TimeToGo2.WebApp.Data;
+
+public class DayData : Entity
 {
     public int DayInMonth { get; set; }
 

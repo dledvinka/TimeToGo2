@@ -1,25 +1,34 @@
 namespace TimeToGo2.WebApp.ViewModels;
 
-using TimeToGo2.WebApp.Data;
+using MediatR;
+using TimeToGo2.WebApp.Configuration;
+using TimeToGo2.WebApp.Features.Month;
 
 public class MonthPageViewModel
 {
     private readonly IJobConstraints _jobConstraints;
-    private readonly IMonthService _monthService;
+    private readonly IMediator _mediator;
 
     public MonthDataViewModel MonthData { get; set; }
 
-    public MonthPageViewModel(IMonthService monthService, IJobConstraints jobConstraints)
+    public MonthPageViewModel(IMediator mediator, IJobConstraints jobConstraints)
     {
-        _monthService = monthService;
+        _mediator = mediator;
         _jobConstraints = jobConstraints;
     }
 
-
     public async Task InitializeAsync(int year, int month)
     {
-        var monthData = await _monthService.GetAsync(year, month);
+        var monthData = await _mediator.Send(new GetList.Query(year, month));
         MonthData = new MonthDataViewModel(_jobConstraints);
         MonthData.SetData(monthData);
+    }
+
+    public async Task UpdateDayAsync(DayViewModel dayViewModel)
+    {
+        if (dayViewModel.IsValid)
+        {
+            var updateResult = await _mediator.Send(new UpdateDay.Command(dayViewModel.GetData()));
+        }
     }
 }
