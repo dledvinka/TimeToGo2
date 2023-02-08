@@ -8,8 +8,8 @@
         private TimeSpan? deltaFromGateSystem;
         private bool isWorkDay;
         private TimeSpan? spentOutside;
-        private TimeOnly? timeArrived;
-        private TimeOnly? timeLeft;
+        private TimeSpan? timeArrived;
+        private TimeSpan? timeLeft;
 
         public TimeSpan DailyDelta { get; private set; }
 
@@ -80,45 +80,45 @@
             }
         }
 
-        public TimeOnly? TimeArrived
+        public TimeSpan? TimeArrived
         {
-            get => timeArrived;
-            set
-            {
-                timeArrived = value;
+	        get => timeArrived;
+	        set
+	        {
+		        timeArrived = value;
 
-                if (value != null)
-                {
-                    DeltaFromGateSystem = null;
-                    Recalculate();
-                }
-            }
+		        if (value != null)
+		        {
+			        DeltaFromGateSystem = null;
+			        Recalculate();
+		        }
+	        }
         }
 
-        public TimeOnly? TimeLeft
-        {
-            get => timeLeft;
-            set
-            {
-                timeLeft = value;
+		public TimeSpan? TimeLeft
+		{
+			get => timeLeft;
+			set
+			{
+				timeLeft = value;
 
-                if (value != null)
-                {
-                    DeltaFromGateSystem = null;
-                    Recalculate();
-                }
-            }
-        }
+				if (value != null)
+				{
+					DeltaFromGateSystem = null;
+					Recalculate();
+				}
+			}
+		}
 
-        public bool IsEditing { get; set; }
+		public bool IsEditing { get; set; }
 
         public DayViewModel(IJobConstraints jobConstraints) => _jobConstraints = jobConstraints;
 
         private TimeSpan GetCalculatedPauseDuration()
         {
             var pauseDuration = (!SpentOutside.HasValue || SpentOutside == TimeSpan.Zero) ? _jobConstraints.MinimalLunchPauseDuration : SpentOutside.Value;
-            var timeLeft = TimeLeft?.ToTimeSpan() ?? (TimeArrived.Value.ToTimeSpan() + TimeSpan.FromHours(8));
-            var workedDuration = timeLeft - TimeArrived.Value.ToTimeSpan();
+            var timeLeft = TimeLeft ?? (TimeArrived.Value + TimeSpan.FromHours(8));
+            var workedDuration = timeLeft - TimeArrived.Value;
             var workedOverDailyLunchPa =
                 TimeSpan.FromMinutes(Math.Max((workedDuration - _jobConstraints.LunchPauseAppliesAfterAmountOfWorkedHours).TotalMinutes, 0));
             var calculatedPauseDuration = TimeSpan.FromMinutes(SpentOutside.HasValue
@@ -157,8 +157,8 @@
         public void SetData(int year, int month, DayData dayData)
         {
             Id = dayData.Id;
-            TimeArrived = dayData.TimeArrived;
-            TimeLeft = dayData.TimeLeft;
+            TimeArrived = dayData.TimeArrived?.ToTimeSpan();
+            TimeLeft = dayData.TimeLeft?.ToTimeSpan();
             SpentOutside = dayData.SpentOutside;
             DeltaFromGateSystem = dayData.DeltaFromGateSystem;
             IsWorkDay = dayData.IsWorkDay;
