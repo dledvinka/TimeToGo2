@@ -16,6 +16,17 @@ else
 	<h1>Month overview @monthData.Month/@monthData.Year</h1>
 	@*https://stackoverflow.com/questions/60906486/blazor-inline-editing-table-and-getting-all-component-values-on-event*@
 
+	<DxGrid Data="@monthData.Days">
+		<Columns>
+			<DxGridDataColumn FieldName="DayOfWeek" MinWidth="100"/>
+			@*<DxGridDataColumn FieldName="Date" DisplayFormat="D" MinWidth="100" />
+			<DxGridDataColumn FieldName="Forecast" Width="15%" />
+			<DxGridDataColumn FieldName="CloudCover" Width="15%" />
+			<DxGridDataColumn FieldName="TemperatureC" Caption="@("Temp. (\x2103)")" Width="10%" />
+			<DxGridDataColumn FieldName="TemperatureF" Caption="@("Temp. (\x2109)")" Width="10%" />*@
+		</Columns>
+	</DxGrid>
+
 	<table class="table">
 		<thead>
 		<tr>

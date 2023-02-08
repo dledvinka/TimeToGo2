@@ -5,6 +5,7 @@ namespace TimeToGo2.WebApp
     using TimeToGo2.WebApp.Configuration;
     using TimeToGo2.WebApp.Features.Weather;
     using TimeToGo2.WebApp.ViewModels;
+    using DevExpress.Blazor;
 
     public class Program
     {
@@ -17,7 +18,10 @@ namespace TimeToGo2.WebApp
             builder.Services.AddServerSideBlazor();
             builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
             builder.Services.AddSingleton<IJobConstraints, JobConstraints>();
+            builder.Services.AddDevExpressBlazor(configure => configure.BootstrapVersion = BootstrapVersion.v5);
             builder.Services.AddSingleton<MonthPageViewModel>();
+            builder.WebHost.UseWebRoot("wwwroot");
+            builder.WebHost.UseStaticWebAssets();
 
             var app = builder.Build();
 
