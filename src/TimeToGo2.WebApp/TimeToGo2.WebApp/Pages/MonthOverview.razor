@@ -1,6 +1,7 @@
 ﻿@page "/month/{year:int?}/{month:int?}"
 @using TimeToGo2.WebApp.ViewModels
 @inject MonthPageViewModel ViewModel
+@inject IAuthorizationService AuthorizationService
 
 <PageTitle>Month overview</PageTitle>
 
@@ -9,93 +10,100 @@
 
 @if (monthData == null)
 {
-	<h1>Month overview</h1>
-	<p><em>Loading...</em></p>
+    <h1>Month overview</h1>
+    <p><em>Loading...</em></p>
 }
 else
 {
-	<h1>Month overview @monthData.Month/@monthData.Year</h1>
-	@*https://stackoverflow.com/questions/60906486/blazor-inline-editing-table-and-getting-all-component-values-on-event*@
+    <h1>Month overview @monthData.Month/@monthData.Year</h1>
+    @*https://stackoverflow.com/questions/60906486/blazor-inline-editing-table-and-getting-all-component-values-on-event*@
 
-	<DxGrid Data="@monthData.Days" 
-	        AllowSort="false" 
-	        ShowAllRows="true" 
-	        EditMode="GridEditMode.EditRow" 
-	        EditModelSaving="OnEditModelSaving" 
-	        DataItemDeleting="OnDataItemDeleting"
-		CustomizeEditModel="Grid_CustomizeEditModel">
-		<DataColumnCellEditTemplate>
-			@{
-				var employee = (DayViewModel)context.EditModel;
-				switch (context.DataColumn.FieldName)
-				{
-					case "TimeArrived":
-						<DxTimeEdit @bind-Time="@employee.TimeArrived" Mask="@DateTimeMask.ShortTime" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-						            CssClass="cw-320"></DxTimeEdit>
-						break;
-					case "TimeLeft":
-						<DxTimeEdit @bind-Time="@employee.TimeLeft" Mask="@DateTimeMask.ShortTime" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-						            CssClass="cw-320"></DxTimeEdit>
-						break;
-					case "DeltaFromGateSystem":
-						<DxTimeEdit @bind-Time="@employee.DeltaFromGateSystem" Mask="@DateTimeMask.ShortTime"></DxTimeEdit>
-						break;
-				}
-			}
-		</DataColumnCellEditTemplate>
+    <DxGrid Data="@monthData.Days"
+        AllowSort="false"
+        ShowAllRows="true"
+        EditMode="GridEditMode.EditRow"
+        EditModelSaving="OnEditModelSaving"
+        DataItemDeleting="OnDataItemDeleting"
+        CustomizeEditModel="Grid_CustomizeEditModel">
+        <DataColumnCellEditTemplate>
+            @{
+                var employee = (DayViewModel)context.EditModel;
+                switch (context.DataColumn.FieldName)
+                {
+                    case "TimeArrived":
+                        <DxTimeEdit @bind-Time="@employee.TimeArrived" Mask="@DateTimeMask.ShortTime" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                    CssClass="cw-320"></DxTimeEdit>
+                        break;
+                    case "TimeLeft":
+                        <DxTimeEdit @bind-Time="@employee.TimeLeft" Mask="@DateTimeMask.ShortTime" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                    CssClass="cw-320"></DxTimeEdit>
+                        break;
+                    case "DeltaFromGateSystem":
+                        <DxTimeEdit @bind-Time="@employee.DeltaFromGateSystem" Mask="@DateTimeMask.ShortTime"></DxTimeEdit>
+                        break;
+                }
+            }
+        </DataColumnCellEditTemplate>
 
-		<Columns>
-			<DxGridCommandColumn Width="200px" />
-			<DxGridDataColumn FieldName="DayInMonth" />
-			<DxGridDataColumn FieldName="DayOfWeek" />
-			<DxGridDataColumn FieldName="TimeArrived" />
-			<DxGridDataColumn FieldName="TimeLeft" />
-			<DxGridDataColumn FieldName="SpentOutside" />
-			<DxGridDataColumn FieldName="DeltaFromGateSystem" />
-			<DxGridDataColumn FieldName="DailyDelta" DisplayFormat="t" />
-			<DxGridDataColumn FieldName="IsWorkDay">
-				<CellDisplayTemplate>
-					<DxCheckBox Checked="@((bool)context.Value)" Enabled="false" />
-				</CellDisplayTemplate>
-			</DxGridDataColumn>
-		</Columns>
-	</DxGrid>
+        <Columns>
+            <DxGridCommandColumn Width="100px" DeleteButtonVisible="false" NewButtonVisible="false" />
+            <DxGridDataColumn FieldName="DayInMonth" />
+            <DxGridDataColumn FieldName="DayOfWeek" />
+            <DxGridDataColumn FieldName="TimeArrived" />
+            <DxGridDataColumn FieldName="TimeLeft" />
+            <DxGridDataColumn FieldName="SpentOutside" />
+            <DxGridDataColumn FieldName="DeltaFromGateSystem" />
+            <DxGridDataColumn FieldName="DailyDelta" DisplayFormat="t" />
+            <DxGridDataColumn FieldName="IsWorkDay">
+                <CellDisplayTemplate>
+                    <DxCheckBox Checked="@((bool)context.Value)" Enabled="false" />
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+        </Columns>
+    </DxGrid>
 }
 
 @code {
-	[Parameter]
-	public int? Year { get; set; }
 
-	[Parameter]
-	public int? Month { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
 
-	protected override void OnInitialized()
-	{
-		Year = Year ?? DateTime.Now.Year;
-		Month = Month ?? DateTime.Now.Month;
-	}
+    [Parameter]
+    public int? Year { get; set; }
 
-	private MonthDataViewModel? monthData;
+    [Parameter]
+    public int? Month { get; set; }
 
-	protected override async Task OnInitializedAsync()
-	{
-		await ViewModel.InitializeAsync(Year.Value, Month.Value);
-		monthData = ViewModel.MonthData;
-	}
+    protected override void OnInitialized()
+    {
+        Year = Year ?? DateTime.Now.Year;
+        Month = Month ?? DateTime.Now.Month;
+    }
 
-	async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
-	{
-		e.EditModel = e.DataItem;
-	}
+    private MonthDataViewModel? monthData;
 
-	private Task OnEditModelSaving(GridEditModelSavingEventArgs arg)
-	{
-		return Task.CompletedTask;
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationState;
+        var userIdentityName = authState?.User.Identity.Name;
 
-	private Task OnDataItemDeleting(GridDataItemDeletingEventArgs arg)
-	{
-		return Task.CompletedTask;
-	}
+        await ViewModel.InitializeAsync(userIdentityName, Year.Value, Month.Value);
+        monthData = ViewModel.MonthData;
+    }
+
+    async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+        e.EditModel = e.DataItem;
+    }
+
+    private Task OnEditModelSaving(GridEditModelSavingEventArgs arg)
+    {
+        return Task.CompletedTask;
+    }
+
+    private Task OnDataItemDeleting(GridDataItemDeletingEventArgs arg)
+    {
+        return Task.CompletedTask;
+    }
 
 }

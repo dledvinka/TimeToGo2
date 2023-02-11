@@ -4,7 +4,7 @@
 
     public class GetList
     {
-        public record Query(int Year, int Month) : IRequest<MonthData>;
+        public record Query(string? UserIdentityName, int Year, int Month) : IRequest<MonthData>;
 
         public class QueryHandler : IRequestHandler<Query, MonthData>
         {

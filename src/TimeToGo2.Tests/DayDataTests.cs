@@ -22,16 +22,15 @@
         [TestCase(8, 0, 14, 30, 20, -120)]
         [TestCase(8, 0, 14, 30, 60, -150)]
         public void ManuallyEnteredDataTest(int timeArrivedHour, int timeArrivedMinute, int timeLeftHour, int timeLeftMinute,
-                                   int? pauseDurationInMinutes, int expectedDailyDelta)
+                                            int? pauseDurationInMinutes, int expectedDailyDelta)
         {
             var dayViewModel = new DayViewModel(jobConstraints)
             {
-                TimeArrived = TimeOnly.FromTimeSpan(TimeSpan.FromHours(timeArrivedHour) + TimeSpan.FromMinutes(timeArrivedMinute)),
-                TimeLeft = TimeOnly.FromTimeSpan(TimeSpan.FromHours(timeLeftHour) + TimeSpan.FromMinutes(timeLeftMinute)),
+                TimeArrived = TimeSpan.FromHours(timeArrivedHour) + TimeSpan.FromMinutes(timeArrivedMinute),
+                TimeLeft = TimeSpan.FromHours(timeLeftHour) + TimeSpan.FromMinutes(timeLeftMinute),
                 SpentOutside = pauseDurationInMinutes.HasValue ? TimeSpan.FromMinutes(pauseDurationInMinutes.Value) : TimeSpan.Zero,
+                IsWorkDay = true
             };
-
-            dayViewModel.IsWorkDay = true;
 
             using (new AssertionScope())
             {

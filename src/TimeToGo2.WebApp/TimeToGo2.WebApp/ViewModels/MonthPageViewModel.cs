@@ -17,9 +17,9 @@ public class MonthPageViewModel
         _jobConstraints = jobConstraints;
     }
 
-    public async Task InitializeAsync(int year, int month)
+    public async Task InitializeAsync(string? userIdentityName, int year, int month)
     {
-        var monthData = await _mediator.Send(new GetList.Query(year, month));
+        var monthData = await _mediator.Send(new GetList.Query(userIdentityName, year, month));
         MonthData = new MonthDataViewModel(_jobConstraints);
         MonthData.SetData(monthData);
     }

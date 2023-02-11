@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using TimeToGo2.WebApp.Data;
 namespace TimeToGo2.WebApp
 {
     using System.Reflection;
@@ -6,12 +9,20 @@ namespace TimeToGo2.WebApp
     using TimeToGo2.WebApp.Features.Weather;
     using TimeToGo2.WebApp.ViewModels;
     using DevExpress.Blazor;
+    using TimeToGo2.WebApp.Areas.Identity;
 
     public class Program
     {
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            var connectionString = builder.Configuration.GetConnectionString("TimeToGoDbContextConnection") ?? throw new InvalidOperationException("Connection string 'AppContextConnection' not found.");
+
+            builder.Services.AddDbContext<TimeToGoDbContext>(options => options.UseSqlServer(connectionString));
+
+            builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                   .AddRoles<IdentityRole>()
+                   .AddEntityFrameworkStores<TimeToGoDbContext>();
 
             // Add services to the container.
             builder.Services.AddRazorPages();
@@ -20,6 +31,8 @@ namespace TimeToGo2.WebApp
             builder.Services.AddSingleton<IJobConstraints, JobConstraints>();
             builder.Services.AddDevExpressBlazor(configure => configure.BootstrapVersion = BootstrapVersion.v5);
             builder.Services.AddSingleton<MonthPageViewModel>();
+            
+            builder.Services.AddScoped<TokenProvider>();
             builder.WebHost.UseWebRoot("wwwroot");
             builder.WebHost.UseStaticWebAssets();
 
@@ -38,7 +51,10 @@ namespace TimeToGo2.WebApp
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
+            app.MapRazorPages();
             app.MapBlazorHub();
             app.MapFallbackToPage("/_Host");
 

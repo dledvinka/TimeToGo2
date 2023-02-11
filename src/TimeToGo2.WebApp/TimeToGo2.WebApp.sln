@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeToGo2.WebApp", "TimeToGo2.WebApp\TimeToGo2.WebApp.csproj", "{9C759A89-D8D6-4C13-89E8-0ED69DF2710F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeToGo2.WebApp", "TimeToGo2.WebApp\TimeToGo2.WebApp.csproj", "{9C759A89-D8D6-4C13-89E8-0ED69DF2710F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeToGo2.Tests", "..\TimeToGo2.Tests\TimeToGo2.Tests.csproj", "{B903C26E-7536-409B-B7D7-2D9BB53FE610}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeToGo2.Tests", "..\TimeToGo2.Tests\TimeToGo2.Tests.csproj", "{B903C26E-7536-409B-B7D7-2D9BB53FE610}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
