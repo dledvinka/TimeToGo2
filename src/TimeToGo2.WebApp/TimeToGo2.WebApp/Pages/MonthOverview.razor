@@ -1,7 +1,17 @@
 ﻿@page "/month/{year:int?}/{month:int?}"
 @using TimeToGo2.WebApp.ViewModels
 @inject MonthPageViewModel ViewModel
-@inject IAuthorizationService AuthorizationService
+
+<style>
+    .weekend-day, 
+    .weekend-day > td {
+        background-color: lightgrey;
+    }
+
+    .weekend-day > td > button {
+        visibility: hidden
+    }
+</style>
 
 <PageTitle>Month overview</PageTitle>
 
@@ -21,6 +31,7 @@ else
     <DxGrid Data="@monthData.Days"
         AllowSort="false"
         ShowAllRows="true"
+        CustomizeElement="OnCustomizeElement"
         EditMode="GridEditMode.EditRow"
         EditModelSaving="OnEditModelSaving"
         DataItemDeleting="OnDataItemDeleting"
@@ -38,6 +49,10 @@ else
                         <DxTimeEdit @bind-Time="@employee.TimeLeft" Mask="@DateTimeMask.ShortTime" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                     CssClass="cw-320"></DxTimeEdit>
                         break;
+                    case "SpentOutside":
+                        <DxTimeEdit @bind-Time="@employee.SpentOutside" Mask="@DateTimeMask.ShortTime" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                    CssClass="cw-320"></DxTimeEdit>
+                        break;
                     case "DeltaFromGateSystem":
                         <DxTimeEdit @bind-Time="@employee.DeltaFromGateSystem" Mask="@DateTimeMask.ShortTime"></DxTimeEdit>
                         break;
@@ -47,12 +62,11 @@ else
 
         <Columns>
             <DxGridCommandColumn Width="100px" DeleteButtonVisible="false" NewButtonVisible="false" />
-            <DxGridDataColumn FieldName="DayInMonth" />
-            <DxGridDataColumn FieldName="DayOfWeek" />
-            <DxGridDataColumn FieldName="TimeArrived" />
-            <DxGridDataColumn FieldName="TimeLeft" />
-            <DxGridDataColumn FieldName="SpentOutside" />
-            <DxGridDataColumn FieldName="DeltaFromGateSystem" />
+            <DxGridDataColumn FieldName="DisplayName" />
+            <DxGridDataColumn FieldName="TimeArrived" DisplayFormat="t" />
+            <DxGridDataColumn FieldName="TimeLeft" DisplayFormat="t" />
+            <DxGridDataColumn FieldName="SpentOutside" DisplayFormat="t" />
+            <DxGridDataColumn FieldName="DeltaFromGateSystem" DisplayFormat="t" />
             <DxGridDataColumn FieldName="DailyDelta" DisplayFormat="t" />
             <DxGridDataColumn FieldName="IsWorkDay">
                 <CellDisplayTemplate>
@@ -106,4 +120,14 @@ else
         return Task.CompletedTask;
     }
 
+    private void OnCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow)
+        {
+            var isWorkDay = (bool)e.Grid.GetRowValue(e.VisibleIndex, nameof(DayViewModel.IsWorkDay));
+
+            if (!isWorkDay)
+                e.CssClass = "weekend-day";
+        }
+    }
 }

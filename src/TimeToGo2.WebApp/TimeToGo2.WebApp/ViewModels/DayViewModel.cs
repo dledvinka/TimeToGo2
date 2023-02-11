@@ -13,6 +13,8 @@
 
         public TimeSpan DailyDelta { get; private set; }
 
+        public string DisplayName => $"{DayInMonth} - {DayOfWeek}";
+
         public int DayInMonth { get; private set; }
 
         public DayOfWeek DayOfWeek { get; private set; }
